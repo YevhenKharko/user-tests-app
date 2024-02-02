@@ -1,0 +1,30 @@
+-- Create the database
+CREATE DATABASE IF NOT EXISTS users_math_ex;
+
+-- Use the database
+USE users_math_ex;
+
+-- Create the users table
+CREATE TABLE IF NOT EXISTS users (
+    id INT(10) UNSIGNED AUTO_INCREMENT NOT NULL,
+    name VARCHAR(20) NOT NULL,
+    username VARCHAR(20) NOT NULL,
+    password_hash VARCHAR(256) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL,
+    PRIMARY KEY (id)
+);
+
+-- Create the tests table
+CREATE TABLE IF NOT EXISTS tests (
+    id INT(10) UNSIGNED AUTO_INCREMENT NOT NULL,
+    user_id INT(10) UNSIGNED NOT NULL,
+    description VARCHAR(100) NOT NULL,
+    answer VARCHAR(10) NOT NULL,
+    status TINYINT(4) UNSIGNED DEFAULT 0 NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL,
+    PRIMARY KEY (id),
+    KEY fk_test_user (user_id),
+    CONSTRAINT fk_test_user FOREIGN KEY (user_id) REFERENCES users (id)
+);
