@@ -1,30 +1,28 @@
--- Create the database
-CREATE DATABASE IF NOT EXISTS users-tests;
+create db users-tests;
 
--- Use the database
-USE users-tests;
+use users-tests;
 
--- Create the users table
-CREATE TABLE IF NOT EXISTS users (
-    id INT(10) UNSIGNED AUTO_INCREMENT NOT NULL,
-    name VARCHAR(20) NOT NULL,
-    username VARCHAR(20) NOT NULL,
-    password_hash VARCHAR(256) NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL,
-    PRIMARY KEY (id)
+create table users (
+    id int(10) unsigned not null, auto_increment,
+    name varchar(20) not null,
+    username varchar(20) not null,
+    password_hash varchar(256) not null,
+    created_at timestamp not null default current_timestamp,
+    updated_at timestamp not null default current_timestamp on update current_timestamp,
+    deleted_at timestamp null default null,
+    primary key (id)
 );
 
--- Create the tests table
-CREATE TABLE IF NOT EXISTS tests (
-    id INT(10) UNSIGNED AUTO_INCREMENT NOT NULL,
-    user_id INT(10) UNSIGNED NOT NULL,
-    description VARCHAR(100) NOT NULL,
-    answer VARCHAR(10) NOT NULL,
-    status TINYINT(4) UNSIGNED DEFAULT 0 NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL,
-    PRIMARY KEY (id),
-    KEY fk_test_user (user_id),
-    CONSTRAINT fk_test_user FOREIGN KEY (user_id) REFERENCES users (id)
+create table tests (
+    id int(10) unsigned not null, auto_increment,
+    user_id int(10) unsigned not null,
+    description varchar(100) not null,
+    answer varchar(10) not null,
+    status tinyint(4) unsigned not null default 0,
+    created_at timestamp not null default current_timestamp,
+    updated_at timestamp not null default current_timestamp on update current_timestamp,
+    deleted_at timestamp null default null,
+    primary key (id),
+    key fk_test_user (user_id),
+    constraint fk_test_user foreign key (user_id) references users (id)
 );
