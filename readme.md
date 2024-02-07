@@ -1,4 +1,5 @@
-1. Create .env: ```
+1. Create .env: 
+```
   HOST=<your host>
   USER=<your user>
   PASSWORD=<your password>
