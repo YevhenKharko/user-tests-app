@@ -1,16 +1,80 @@
 require('dotenv').config();
+const mysql = require('mysql2/promise');
 const express = require('express');
 const cors = require('cors');
 const errorHandler = require('./utils/errorHandler');
 const md5 = require('md5');
+const retry = require('retry');
 const { getUsers, getUser, createUser, deleteUser, updateUser, verifyUser } = require('./controllers/users');
 const { getTests, getTest, startNewTest, checkTest } = require('./controllers/tests');
+const { HOST, PASSWORD, USER, DATABASE, DBPORT } = process.env;
 
 const app = express();
 const PORT = 3000;
 
+const dbConfig = {
+  host: HOST,
+  user: USER,
+  password: PASSWORD,
+  database: DATABASE,
+};
+
+const createTables = async () => {
+  const operation = retry.operation({
+    retries: 5,
+    factor: 2,
+    minTimeout: 1000,
+    maxTimeout: 5000,
+  });
+
+  operation.attempt(async (currentAttempt) => {
+    try {
+      const connection = await mysql.createConnection(dbConfig);
+
+      await connection.query(`
+    CREATE TABLE IF NOT EXISTS users (
+      id INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+      name VARCHAR(20) NOT NULL,
+      user_name VARCHAR(20) NOT NULL,
+      password_hash VARCHAR(256) NOT NULL,
+      created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+      deleted_at TIMESTAMP NULL DEFAULT NULL,
+      PRIMARY KEY (id)
+    );
+  `);
+
+  await connection.query(`
+  CREATE TABLE IF NOT EXISTS tests (
+    id INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+    user_id INT(10) UNSIGNED NOT NULL,
+    description VARCHAR(100) NOT NULL,
+    answer VARCHAR(10) NOT NULL,
+    status TINYINT(4) UNSIGNED NOT NULL DEFAULT 0,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    deleted_at TIMESTAMP NULL DEFAULT NULL,
+    PRIMARY KEY (id),
+    INDEX fk_test_user (user_id),
+    CONSTRAINT fk_test_user FOREIGN KEY (user_id) REFERENCES users (id)
+  );
+`);
+
+      connection.end();
+      console.log('Tables created successfully');
+    } catch (error) {
+      console.error(`Error creating tables (Attempt ${currentAttempt}):`, error);
+
+      if (operation.retry(error)) {
+        return;
+      }
+    }
+  });
+};
+createTables();
+
 app.use(errorHandler, express.json(), cors({
-  origin: 'http://localhost:5173',
+  origin: '*',
 }));
 //GET ALL USERS
 app.get('/users', async (req, res, next) => {
