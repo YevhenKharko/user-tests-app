@@ -12,4 +12,4 @@
 
 4. Run application ```npm run dev``` in terminal
 
-FE-REPO here: ```https://github.com/YevhenKharko/users-tests-app-fe```
+Client-side repository here: ```https://github.com/YevhenKharko/users-tests-app-fe```
