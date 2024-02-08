@@ -1,4 +1,6 @@
-1. Create .env: 
+1. Install all dependencies ```npm i```
+
+2. Create .env.
 ```
   HOST=<your host>
   USER=<your user>
@@ -6,6 +8,6 @@
   DATABASE="users-tests"
 ```
 
-2. Connect to MySQL and run from queries './db/init_db.sql':
+2. A new database is created automatically, but if you want to create it by yourself: Connect to MySQL and run from queries ```'./db/init_db.sql'```
 
 3. Run application ```npm run dev``` in terminal
